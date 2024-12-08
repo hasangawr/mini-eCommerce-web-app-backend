@@ -10,7 +10,7 @@ export interface IProduct {
   sku: string;
   quantity: number;
   name: string;
-  images: [IImage];
+  images: IImage[];
   description: string;
   createdAt: Date;
 }

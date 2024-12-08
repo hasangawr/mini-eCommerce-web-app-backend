@@ -3,6 +3,7 @@ import {
   _addProduct,
   _deleteProduct,
   _getAllProducts,
+  _updateProduct,
 } from "../services/productService";
 import { IImage } from "../models/product";
 
@@ -13,7 +14,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
   try {
     const products = await _getAllProducts();
 
-    res.status(200).json(products);
+    res.status(200).json({ products: products });
   } catch (error) {
     console.error("Product retrieval error: ", error);
     res
@@ -28,6 +29,8 @@ export const getAllProducts = async (req: Request, res: Response) => {
 export const addProduct = async (req: Request, res: Response) => {
   try {
     let images: IImage[] = [];
+
+    console.log(req);
 
     if (req.files) {
       images = (req.files as Express.Multer.File[]).map(
@@ -65,7 +68,50 @@ export const addProduct = async (req: Request, res: Response) => {
 // @desc update a product
 // @route PUT /api/products/:id
 // @access
-export const updateProduct = async (req: Request, res: Response) => {};
+export const updateProduct = async (req: Request, res: Response) => {
+  const sku = req.params.id;
+
+  let images: IImage[] = [];
+
+  if (req.files) {
+    images = (req.files as Express.Multer.File[]).map(
+      (file: Express.Multer.File) => {
+        return {
+          data: file.buffer,
+          contentType: file.mimetype,
+        };
+      }
+    );
+  }
+
+  try {
+    if (sku) {
+      const updatedProduct = await _updateProduct(
+        sku,
+        req.body.sku,
+        Number(req.body.quantity),
+        req.body.name,
+        images,
+        req.body.description
+      );
+
+      if (updatedProduct) {
+        res.status(201).json(updatedProduct);
+        return;
+      }
+
+      res.status(400).json({ message: "Product with new SKU already exist" });
+      return;
+    }
+    res.status(400).json({ message: "Invalid request" });
+    return;
+  } catch (error) {
+    console.error("Product update error: ", error);
+    res
+      .status(500)
+      .json({ message: "An error occured, please try again later" });
+  }
+};
 
 // @desc delete a product
 // @route DELETE /api/products/:id
@@ -79,7 +125,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
 
       if (deletedProduct) {
         res.status(200).json({
-          message: `Product ${deletedProduct.sku} successfully deleted`,
+          id: deletedProduct.sku,
         });
         return;
       }

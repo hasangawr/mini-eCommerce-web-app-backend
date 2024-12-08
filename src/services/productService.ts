@@ -40,7 +40,34 @@ export const _updateProduct = async (
   images: IImage[],
   description: string
 ) => {
-  const product = await Product.findOne({ oldSku });
+  const product = await Product.findOne({ sku: oldSku });
+  const productWithNewSku = await Product.findOne({ sku });
+
+  if (oldSku === sku && product) {
+    product.quantity = quantity;
+    product.name = name;
+    product.images = images;
+    product.description = description;
+
+    await product.save();
+
+    return product;
+  } else {
+    if (product && !productWithNewSku) {
+      product.sku = sku;
+      product.quantity = quantity;
+      product.name = name;
+      product.images = images;
+      product.description = description;
+
+      await product.save();
+
+      console.log("saved: ", product);
+      return product;
+    }
+  }
+
+  return null;
 };
 
 export const _deleteProduct = async (sku: string) => {
