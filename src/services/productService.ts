@@ -62,7 +62,6 @@ export const _updateProduct = async (
 
       await product.save();
 
-      console.log("saved: ", product);
       return product;
     }
   }
@@ -73,4 +72,18 @@ export const _updateProduct = async (
 export const _deleteProduct = async (sku: string) => {
   const product = await Product.findOneAndDelete({ sku });
   return product;
+};
+
+export const _changeFav = async (sku: string) => {
+  const product = await Product.findOne({ sku });
+
+  if (product) {
+    product.isFavourite = !product.isFavourite;
+
+    await product.save();
+
+    return product;
+  }
+
+  return null;
 };

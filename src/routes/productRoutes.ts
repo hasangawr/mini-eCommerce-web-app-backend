@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   addProduct,
+  changeFav,
   deleteProduct,
   getAllProducts,
   updateProduct,
@@ -15,6 +16,7 @@ const router = Router();
 router.get("/", getAllProducts);
 router.post("/", upload.array("images"), addProduct);
 router.put("/:id", upload.array("images"), updateProduct);
+router.put("/:id/fav", changeFav);
 router.delete("/:id", deleteProduct);
 
 export default router;

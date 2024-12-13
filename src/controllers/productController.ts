@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {
   _addProduct,
+  _changeFav,
   _deleteProduct,
   _getAllProducts,
   _updateProduct,
@@ -134,6 +135,31 @@ export const deleteProduct = async (req: Request, res: Response) => {
     res.status(400).json({ message: "Product with this SKU does not exist" });
   } catch (error) {
     console.error("Product deletion error: ", error);
+    res
+      .status(500)
+      .json({ message: "An error occured, please try again later" });
+  }
+};
+
+// @desc update product favourite
+// @route PUT /api/products/:id/fav
+// @access
+export const changeFav = async (req: Request, res: Response) => {
+  const sku = req.params.id;
+
+  try {
+    if (sku) {
+      const favChangedProduct = await _changeFav(sku);
+
+      if (favChangedProduct) {
+        res.status(200).json(favChangedProduct);
+        return;
+      }
+
+      res.status(400).json({ message: "Product with this SKU does not exist" });
+    }
+  } catch (error) {
+    console.error(`Change favourite failed for product ${sku}`, error);
     res
       .status(500)
       .json({ message: "An error occured, please try again later" });

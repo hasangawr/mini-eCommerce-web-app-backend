@@ -12,6 +12,7 @@ export interface IProduct {
   name: string;
   images: IImage[];
   description: string;
+  isFavourite: boolean;
   createdAt: Date;
 }
 
@@ -27,6 +28,10 @@ const productSchema = new Schema<IProduct>({
   },
   description: {
     type: String,
+  },
+  isFavourite: {
+    type: Boolean,
+    default: false,
   },
   createdAt: {
     type: Date,
